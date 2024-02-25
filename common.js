@@ -1,1 +1,1 @@
-console.log('ici); 
+console.log('ici');

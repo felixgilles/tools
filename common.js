@@ -1,6 +1,7 @@
 // ==UserScript==
 // @name         Common
 // @description  Common script
+// @resource     Gilles_css https://raw.githubusercontent.com/felixgilles/tools/main/bootstrap.css
 // @grant        GM_getResourceText
 // @grant        GM_addStyle
 // ==/UserScript==

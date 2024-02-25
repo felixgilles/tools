@@ -1,0 +1,4 @@
+.tm-hide, .tm-hide-date {
+  opacity: 0.3;
+  display: none;
+}

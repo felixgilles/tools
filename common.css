@@ -308,49 +308,6 @@
   border-bottom-right-radius: var(--rounded-btn, 0.5rem)
 }
 
-.mr-3 {
-  margin-right: 0.75rem
-}
-
-.block {
-  display: block
-}
-
-.flex {
-  display: flex
-}
-
-.hidden {
+.tm-hidden {
   display: none
-}
-
-.flex-auto {
-  flex: 1 1 auto
-}
-
-.truncate {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap
-}
-
-.whitespace-nowrap {
-  white-space: nowrap
-}
-
-.text-sm {
-  font-size: 0.875rem;
-  line-height: 1.25rem
-}
-
-.font-normal {
-  font-weight: 400
-}
-
-.leading-normal {
-  line-height: 1.5
-}
-
-.filter {
-  filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow)
 }

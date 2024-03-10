@@ -531,6 +531,9 @@
 .tm-menu {
   margin: 0;
 }
+.tm-menu a {
+  color: #000000;
+}
 
 .tm-indicator-item {
   cursor: pointer;

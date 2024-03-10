@@ -2,7 +2,7 @@ class TmFilter {
     filtersCookie = 'tm-filters';
     dateFilterCookie = 'tm-date-filter';
     getFiltersValue() {
-        return GM_getValue(this.filtersCookie, 'on');
+        return GM_getValue(this.filtersCookie, 'on') === 'on';
     }
     setFiltersValue(value) {
         GM_setValue(this.filtersCookie, value);
@@ -16,8 +16,8 @@ class TmFilter {
 
     filterButton(button) {
         const value = this.getFiltersValue();
-        button.innerHTML = value === 'on' ? 'Filtrés cachés' : 'Filtrés affichés';
-        if (value === 'on') {
+        button.innerHTML = value ? 'Filtrés cachés' : 'Filtrés affichés';
+        if (value) {
             button.classList.add('tm-active');
         } else {
             button.classList.remove('tm-active');
@@ -69,9 +69,9 @@ class TmFilter {
         this.filterButton(toggleFilters);
         toggleFilters.addEventListener('click', function (e) {
             e.preventDefault();
-            this.setFiltersValue(this.getFiltersValue() === 'on' ? 'off' : 'on');
+            this.setFiltersValue(this.getFiltersValue() ? 'off' : 'on');
             this.filterButton(toggleFilters);
-            filterCallback(this.getFiltersValue() === 'on');
+            filterCallback(this.getFiltersValue());
         }.bind(this));
 
         const datesMenu = container.querySelector('#tm-dates-menu');

@@ -125,11 +125,29 @@ class TmFilter {
         this.indicatorButton(indicator, indicatorValue === 'hidden');
         indicator.addEventListener('click', function (e) {
             e.preventDefault();
+            e.stopImmediatePropagation()
             indicatorValue = indicatorValue === 'hidden' ? '' : 'hidden';
             this.setIndicatorValue(id, indicatorValue);
             this.indicatorButton(indicator, indicatorValue === 'hidden');
             callback(indicatorValue === 'hidden');
         }.bind(this));
         parent.append(indicator);
+    }
+
+    pagination(prevSelector, nextSelector) {
+        document.addEventListener('keydown', function(e) {
+            if (e.code === 'ArrowRight') {
+                const next = document.querySelector(nextSelector);
+                if (next) {
+                    window.location = next.getAttribute('href');
+                }
+            }
+            if (e.code === 'ArrowLeft') {
+                const prev = document.querySelector(prevSelector);
+                if (prev) {
+                    window.location = prev.getAttribute('href');
+                }
+            }
+        });
     }
 }

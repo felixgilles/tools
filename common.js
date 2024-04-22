@@ -41,7 +41,7 @@ class TmFilter {
     }
     autoNextButton(button) {
         const value = this.getAutoNextValue();
-        button.innerHTML = value ? 'AutoNext désactivé' : 'AutoNext activé';
+        button.innerHTML = value ? 'AutoNext activé' : 'AutoNext désactivé';
         if (value) {
             button.classList.add('tm-active');
         } else {

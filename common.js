@@ -1,11 +1,18 @@
 class TmFilter {
     filtersCookie = 'tm-filters';
+    autoNextCookie = 'tm-auto-next';
     dateFilterCookie = 'tm-date-filter';
     getFiltersValue() {
         return GM_getValue(this.filtersCookie, 'on') === 'on';
     }
     setFiltersValue(value) {
         GM_setValue(this.filtersCookie, value);
+    }
+    getAutoNextValue() {
+        return GM_getValue(this.autoNextCookie, 'on') === 'on';
+    }
+    setAutoNextValue(value) {
+        GM_setValue(this.autoNextCookie, value);
     }
     getDateFilterValue() {
         return GM_getValue(this.dateFilterCookie, '6');
@@ -14,9 +21,27 @@ class TmFilter {
         GM_setValue(this.dateFilterCookie, value);
     }
 
+    profileButton(button, id) {
+        let value = this.getIndicatorValue(id);
+        button.innerHTML = value === 'hidden' ? 'Profil caché' : 'Profil affiché';
+        if (value) {
+            button.classList.add('tm-active');
+        } else {
+            button.classList.remove('tm-active');
+        }
+    }
     filterButton(button) {
         const value = this.getFiltersValue();
         button.innerHTML = value ? 'Filtrés cachés' : 'Filtrés affichés';
+        if (value) {
+            button.classList.add('tm-active');
+        } else {
+            button.classList.remove('tm-active');
+        }
+    }
+    autoNextButton(button) {
+        const value = this.getAutoNextValue();
+        button.innerHTML = value ? 'AutoNext désactivé' : 'AutoNext activé';
         if (value) {
             button.classList.add('tm-active');
         } else {
@@ -36,12 +61,18 @@ class TmFilter {
         });
     }
 
-    filters(filterCallback, filterDateCallback) {
+    filters(params) {
+        const filterCallback = params.filterCallback ?? function() {};
+        const filterDateCallback = params.filterDateCallback ?? false;
+        const autoNext = params.autoNext ?? false;
+        const profile = params.profile ?? null;
         const container = document.createElement('div');
         container.className = 'tm-fixed tm-bottom-0 tm-right-0';
         container.innerHTML = "<div class=\"tm-fixed tm-bottom-0 tm-left-0 \">\n" +
             "    <ul class=\"tm-menu tm-menu-xs bg-base-200\">\n" +
+            "        <li><a class=\"tm-active\" id=\"tm-toggle-profile\"></a></li>\n" +
             "        <li><a class=\"tm-active\" id=\"tm-toggle-filters\"></a></li>\n" +
+            "        <li><a class=\"tm-active\" id=\"tm-toggle-auto-next\"></a></li>\n" +
             "        <li id=\"tm-dates-menu\">\n" +
             "            <details>\n" +
             "                <summary>Dernière activité :</summary>\n" +
@@ -65,6 +96,21 @@ class TmFilter {
             "    </ul>\n" +
             "</div>\n"
 
+        const toggleProfile = container.querySelector('#profile');
+        if (profile) {
+            this.profileButton(toggleProfile, profile);
+            toggleProfile.addEventListener('click', function (e) {
+                e.preventDefault();
+                e.stopImmediatePropagation()
+                let indicatorValue = this.getIndicatorValue(id);
+                indicatorValue = indicatorValue === 'hidden' ? '' : 'hidden';
+                this.setIndicatorValue(id, indicatorValue);
+                this.profileButton(toggleProfile, profile);
+            }.bind(this));
+        } else {
+            toggleProfile.classList.add('tm-hidden');
+        }
+
         const toggleFilters = container.querySelector('#tm-toggle-filters');
         this.filterButton(toggleFilters);
         toggleFilters.addEventListener('click', function (e) {
@@ -73,6 +119,17 @@ class TmFilter {
             this.filterButton(toggleFilters);
             filterCallback(this.getFiltersValue());
         }.bind(this));
+
+        const toggleAutoNext = container.querySelector('#tm-toggle-auto-next');
+        if (autoNext) {
+            this.autoNextButton(toggleAutoNext);
+            toggleFilters.addEventListener('click', function (e) {
+                e.preventDefault();
+                this.setAutoNextValue(this.getAutoNextValue() ? 'off' : 'on');
+            }.bind(this));
+        } else {
+            toggleAutoNext.classList.add('tm-hidden');
+        }
 
         const datesMenu = container.querySelector('#tm-dates-menu');
         if (typeof filterDateCallback === 'function') {

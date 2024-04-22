@@ -2,18 +2,21 @@ class TmFilter {
     filtersCookie = 'tm-filters';
     autoNextCookie = 'tm-auto-next';
     dateFilterCookie = 'tm-date-filter';
+
     getFiltersValue() {
         return GM_getValue(this.filtersCookie, 'on') === 'on';
     }
     setFiltersValue(value) {
         GM_setValue(this.filtersCookie, value);
     }
+
     getAutoNextValue() {
         return GM_getValue(this.autoNextCookie, 'on') === 'on';
     }
     setAutoNextValue(value) {
         GM_setValue(this.autoNextCookie, value);
     }
+
     getDateFilterValue() {
         return GM_getValue(this.dateFilterCookie, '6');
     }
@@ -123,7 +126,7 @@ class TmFilter {
         const toggleAutoNext = container.querySelector('#tm-toggle-auto-next');
         if (autoNext) {
             this.autoNextButton(toggleAutoNext);
-            toggleFilters.addEventListener('click', function (e) {
+            toggleAutoNext.addEventListener('click', function (e) {
                 e.preventDefault();
                 this.setAutoNextValue(this.getAutoNextValue() ? 'off' : 'on');
                 this.autoNextButton(toggleAutoNext);

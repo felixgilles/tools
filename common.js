@@ -102,7 +102,7 @@ class TmFilter {
             toggleProfile.addEventListener('click', function (e) {
                 e.preventDefault();
                 e.stopImmediatePropagation()
-                let indicatorValue = this.getIndicatorValue(id);
+                let indicatorValue = this.getIndicatorValue(profile);
                 indicatorValue = indicatorValue === 'hidden' ? '' : 'hidden';
                 this.setIndicatorValue(id, indicatorValue);
                 this.profileButton(toggleProfile, profile);

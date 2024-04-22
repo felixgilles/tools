@@ -96,7 +96,7 @@ class TmFilter {
             "    </ul>\n" +
             "</div>\n"
 
-        const toggleProfile = container.querySelector('#profile');
+        const toggleProfile = container.querySelector('#tm-toggle-profile');
         if (profile) {
             this.profileButton(toggleProfile, profile);
             toggleProfile.addEventListener('click', function (e) {

@@ -24,10 +24,10 @@ class TmFilter {
     profileButton(button, id) {
         let value = this.getIndicatorValue(id);
         button.innerHTML = value === 'hidden' ? 'Profil caché' : 'Profil affiché';
-        if (value) {
-            button.classList.add('tm-active');
-        } else {
+        if (value === 'hidden') {
             button.classList.remove('tm-active');
+        } else {
+            button.classList.add('tm-active');
         }
     }
     filterButton(button) {

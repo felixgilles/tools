@@ -104,7 +104,7 @@ class TmFilter {
                 e.stopImmediatePropagation()
                 let indicatorValue = this.getIndicatorValue(profile);
                 indicatorValue = indicatorValue === 'hidden' ? '' : 'hidden';
-                this.setIndicatorValue(id, indicatorValue);
+                this.setIndicatorValue(profile, indicatorValue);
                 this.profileButton(toggleProfile, profile);
             }.bind(this));
         } else {

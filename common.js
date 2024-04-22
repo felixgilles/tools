@@ -126,6 +126,7 @@ class TmFilter {
             toggleFilters.addEventListener('click', function (e) {
                 e.preventDefault();
                 this.setAutoNextValue(this.getAutoNextValue() ? 'off' : 'on');
+                this.autoNextButton(toggleAutoNext);
             }.bind(this));
         } else {
             toggleAutoNext.classList.add('tm-hidden');

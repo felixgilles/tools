@@ -4,7 +4,7 @@ class TmRoute {
     tmFilter;
 
     constructor(params) {
-        this.routeDetector = params.routeDetector ?? fn () => false;
+        this.routeDetector = params.routeDetector ?? () => false;
         this.routeCallback = params.routeCallback ?? function () {};
 
         for (const key in params) {

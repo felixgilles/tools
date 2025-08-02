@@ -28,7 +28,7 @@ class TmFilter {
 
     router() {
         TmDebug("router");
-        this.routes.map(function (route) {
+        this.routes.every(function (route) {
             const ok = route.detector();
             if (ok) {
                 TmDebug("route", route.name);

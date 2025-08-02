@@ -15,12 +15,13 @@ class TmFilter {
     filtersCookie = "tm-filters";
     autoNextCookie = "tm-auto-next";
     dateFilterCookie = "tm-date-filter";
+    routes = [];
 
-    routes;
+    constructor(routes) {
+        this.routes = routes;
+    }
 
-    constructor(routes) {}
-
-    rooter() {
+    router() {
         TmDebug("rooter");
         const route = this.routes.find(function (route) {
             return route.routeDetector(this);

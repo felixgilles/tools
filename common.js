@@ -4,11 +4,11 @@ class TmRoute {
     tmFilter;
 
     constructor(params) {
-        this.routeDetector = params.routeDetector ?? () => false;
+        this.routeDetector = params.routeDetector ?? (() => false);
         this.routeCallback = params.routeCallback ?? function () {};
 
         for (const key in params) {
-            if (key === "routeDetector" || key === "routeCallback") {
+            if (key !== "routeDetector" && key !== "routeCallback") {
                 this[key] = params[key];
             }
         }
@@ -68,7 +68,8 @@ class TmFilter {
 
     profileButton(button, id) {
         let value = this.getIndicatorValue(id);
-        button.innerHTML = value === "hidden" ? "Profil caché" : "Profil affiché";
+        button.innerHTML =
+            value === "hidden" ? "Profil caché" : "Profil affiché";
         if (value === "hidden") {
             button.classList.remove("tm-active");
         } else {
@@ -152,7 +153,8 @@ class TmFilter {
                     e.preventDefault();
                     e.stopImmediatePropagation();
                     let indicatorValue = this.getIndicatorValue(profile);
-                    indicatorValue = indicatorValue === "hidden" ? "" : "hidden";
+                    indicatorValue =
+                        indicatorValue === "hidden" ? "" : "hidden";
                     this.setIndicatorValue(profile, indicatorValue);
                     this.profileButton(toggleProfile, profile);
                 }.bind(this),
@@ -180,7 +182,9 @@ class TmFilter {
                 "click",
                 function (e) {
                     e.preventDefault();
-                    this.setAutoNextValue(this.getAutoNextValue() ? "off" : "on");
+                    this.setAutoNextValue(
+                        this.getAutoNextValue() ? "off" : "on",
+                    );
                     this.autoNextButton(toggleAutoNext);
                 }.bind(this),
             );
@@ -193,7 +197,8 @@ class TmFilter {
             const datesMenuSummary = container.querySelector(
                 "#tm-dates-menu summary",
             );
-            const datesMenuChooses = container.querySelectorAll("#tm-dates-menu a");
+            const datesMenuChooses =
+                container.querySelectorAll("#tm-dates-menu a");
             this.filterDateMenu(datesMenuSummary, datesMenuChooses);
             datesMenuChooses.forEach(
                 function (choose) {
@@ -201,9 +206,13 @@ class TmFilter {
                         "click",
                         function (e) {
                             e.preventDefault();
-                            const dateFilterValue = choose.getAttribute("data-value");
+                            const dateFilterValue =
+                                choose.getAttribute("data-value");
                             this.setDateFilterValue(dateFilterValue);
-                            this.filterDateMenu(datesMenuSummary, datesMenuChooses);
+                            this.filterDateMenu(
+                                datesMenuSummary,
+                                datesMenuChooses,
+                            );
                             filterDateCallback(dateFilterValue);
                         }.bind(this),
                     );

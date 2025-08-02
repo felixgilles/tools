@@ -21,10 +21,12 @@ class TmFilter {
     constructor(routes) {}
 
     rooter() {
+        TmDebug("rooter");
         const route = this.routes.find(function (route) {
             return route.routeDetector(this);
         });
         if (route) {
+            TmDebug("route", route);
             route.routeCallback(this);
         }
     }

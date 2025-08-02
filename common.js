@@ -246,6 +246,20 @@ class TmFilter {
             }.bind(this),
         );
         parent.append(indicator);
+
+        document.addEventListener(
+            "keydown",
+            function (e) {
+                if (e.key === "h") {
+                    this.setIndicatorValue(id, "hidden");
+                    this.indicatorButton(indicator, true);
+                }
+                if (e.code === "s") {
+                    this.setIndicatorValue(id, "");
+                    this.indicatorButton(indicator, false);
+                }
+            }.bind(this),
+        );
     }
 
     pagination(prevSelector, nextSelector) {

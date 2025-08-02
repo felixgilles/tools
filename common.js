@@ -34,7 +34,7 @@ class TmFilter {
                 TmDebug("route", route.name, "for", document.location.href);
             }
 
-            return ok;
+            return !ok;
         });
     }
 

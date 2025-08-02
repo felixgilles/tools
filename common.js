@@ -27,11 +27,11 @@ class TmFilter {
     }
 
     router() {
-        TmDebug("router");
+        TmDebug("router", document.location.href);
         this.routes.every(function (route) {
             const ok = route.detector();
             if (ok) {
-                TmDebug("route", route.name);
+                TmDebug("route", route.name, "for", document.location.href);
             }
 
             return ok;

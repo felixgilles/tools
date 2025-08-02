@@ -20,7 +20,7 @@ class TmRoute {
 }
 
 TmDebug = (...args) => {
-    console.info("TmDebug : ", ...args, "");
+    console.info("TmDebug : ", ...args);
 };
 
 class TmFilter {

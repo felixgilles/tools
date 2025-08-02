@@ -250,6 +250,7 @@ class TmFilter {
         document.addEventListener(
             "keydown",
             function (e) {
+                TmDebug("keydown", e.code, this.getIndicatorValue(id));
                 if (e.code === "KeyH") {
                     this.setIndicatorValue(id, "hidden");
                     this.indicatorButton(indicator, true);

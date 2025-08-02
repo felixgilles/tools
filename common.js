@@ -149,6 +149,19 @@ class TmFilter {
                     this.profileButton(toggleProfile, profile);
                 }.bind(this),
             );
+            document.addEventListener(
+                "keydown",
+                function (e) {
+                    if (e.code === "KeyH") {
+                        this.setIndicatorValue(profile, "hidden");
+                        this.profileButton(toggleProfile, profile);
+                    }
+                    if (e.code === "KeyS") {
+                        this.setIndicatorValue(profile, "");
+                        this.profileButton(toggleProfile, profile);
+                    }
+                }.bind(this),
+            );
         } else {
             toggleProfile.classList.add("tm-hidden");
         }
@@ -246,21 +259,6 @@ class TmFilter {
             }.bind(this),
         );
         parent.append(indicator);
-
-        document.addEventListener(
-            "keydown",
-            function (e) {
-                TmDebug("keydown", e.code, this.getIndicatorValue(id));
-                if (e.code === "KeyH") {
-                    this.setIndicatorValue(id, "hidden");
-                    this.indicatorButton(indicator, true);
-                }
-                if (e.code === "KeyS") {
-                    this.setIndicatorValue(id, "");
-                    this.indicatorButton(indicator, false);
-                }
-            }.bind(this),
-        );
     }
 
     pagination(prevSelector, nextSelector) {

@@ -267,13 +267,23 @@ class TmFilter {
             if (e.code === "ArrowRight") {
                 const next = document.querySelector(nextSelector);
                 if (next) {
-                    window.location = next.getAttribute("href");
+                    const href = next.getAttribute("href");
+                    if (href) {
+                        window.location = href;
+                    } else {
+                        next.click();
+                    }
                 }
             }
             if (e.code === "ArrowLeft") {
                 const prev = document.querySelector(prevSelector);
                 if (prev) {
-                    window.location = prev.getAttribute("href");
+                    const href = prev.getAttribute("href");
+                    if (href) {
+                        window.location = href;
+                    } else {
+                        prev.click();
+                    }
                 }
             }
         });

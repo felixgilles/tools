@@ -1,9 +1,21 @@
 class TmRoute {
     routeDetector;
     routeCallback;
-    constructor(routeDetector, routeCallback) {
-        this.routeDetector = routeDetector;
-        this.routeCallback = routeCallback;
+    tmFilter;
+
+    constructor(params) {
+        this.routeDetector = params.routeDetector ?? fn () => false;
+        this.routeCallback = params.routeCallback ?? function () {};
+
+        for (const key in params) {
+            if (key === "routeDetector" || key === "routeCallback") {
+                this[key] = params[key];
+            }
+        }
+    }
+
+    setTmFilter(tmFilter) {
+        this.tmFilter = tmFilter;
     }
 }
 
@@ -28,6 +40,7 @@ class TmFilter {
         });
         if (route) {
             TmDebug("route", route);
+            route.setTmFilter(this);
             route.routeCallback(this);
         }
     }

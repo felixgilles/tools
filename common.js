@@ -20,6 +20,7 @@ class TmFilter {
     filtersCookie = "tm-filters";
     autoNextCookie = "tm-auto-next";
     dateFilterCookie = "tm-date-filter";
+    ageFilterCookie = "tm-age-filter";
     routes = [];
 
     addRoute(route) {
@@ -57,6 +58,13 @@ class TmFilter {
     }
     setDateFilterValue(value) {
         GM_setValue(this.dateFilterCookie, value);
+    }
+
+    getAgeFilterValue() {
+        return GM_getValue(this.ageFilterCookie, "25");
+    }
+    setAgeFilterValue(value) {
+        GM_setValue(this.ageFilterCookie, value);
     }
 
     profileButton(button, id) {
@@ -99,9 +107,23 @@ class TmFilter {
         });
     }
 
+    filterAgeMenu(summary, chooses) {
+        const value = this.getAgeFilterValue();
+        summary.innerHTML = "Age : " + (value ? value + " ans" : "illimitée");
+        chooses.forEach(function (choose) {
+            const chooseValue = choose.getAttribute("data-value");
+            if (value === chooseValue) {
+                choose.classList.add("tm-active");
+            } else {
+                choose.classList.remove("tm-active");
+            }
+        });
+    }
+
     filters(params) {
         const filterCallback = params.filterCallback ?? function () {};
-        const filterDateCallback = params.filterDateCallback ?? false;
+        const filterDate = params.filterDate ?? false;
+        const filterAge = params.filterAge ?? false;
         const autoNext = params.autoNext ?? false;
         const profile = params.profile ?? null;
         const container = document.createElement("div");
@@ -129,6 +151,20 @@ class TmFilter {
             '                    <li><a data-value="10">10 mois</a></li>\n' +
             '                    <li><a data-value="11">11 mois</a></li>\n' +
             '                    <li><a data-value="12">12 mois</a></li>\n' +
+            "                </ul>\n" +
+            "            </details>\n" +
+            "        </li>\n" +
+            '        <li id="tm-ages-menu">\n' +
+            "            <details>\n" +
+            "                <summary>Age :</summary>\n" +
+            "                <ul>\n" +
+            '                    <li><a data-value="">sans limite</a></li>\n' +
+            '                    <li><a data-value="22">22 ans</a></li>\n' +
+            '                    <li><a data-value="25">25 ans</a></li>\n' +
+            '                    <li><a data-value="30">30 ans</a></li>\n' +
+            '                    <li><a data-value="35">35 ans</a></li>\n' +
+            '                    <li><a data-value="40">40 ans</a></li>\n' +
+            '                    <li><a data-value="50">50 ans</a></li>\n' +
             "                </ul>\n" +
             "            </details>\n" +
             "        </li>\n" +
@@ -194,9 +230,9 @@ class TmFilter {
         }
 
         const datesMenu = container.querySelector("#tm-dates-menu");
-        if (typeof filterDateCallback === "function") {
-            const datesMenuSummary = container.querySelector("#tm-dates-menu summary");
-            const datesMenuChooses = container.querySelectorAll("#tm-dates-menu a");
+        if (filterDate && typeof filterCallback === "function") {
+            const datesMenuSummary = datesMenu.querySelector("summary");
+            const datesMenuChooses = datesMenu.querySelectorAll("a");
             this.filterDateMenu(datesMenuSummary, datesMenuChooses);
             datesMenuChooses.forEach(
                 function (choose) {
@@ -207,13 +243,36 @@ class TmFilter {
                             const dateFilterValue = choose.getAttribute("data-value");
                             this.setDateFilterValue(dateFilterValue);
                             this.filterDateMenu(datesMenuSummary, datesMenuChooses);
-                            filterDateCallback(dateFilterValue);
+                            filterCallback(dateFilterValue);
                         }.bind(this),
                     );
                 }.bind(this),
             );
         } else {
             datesMenu.classList.add("tm-hidden");
+        }
+
+        const agesMenu = container.querySelector("#tm-ages-menu");
+        if (filterAge && typeof filterCallback === "function") {
+            const agesMenuSummary = agesMenu.querySelector("summary");
+            const agesMenuChooses = agesMenu.querySelectorAll("a");
+            this.filterAgeMenu(agesMenuSummary, agesMenuChooses);
+            agesMenuChooses.forEach(
+                function (choose) {
+                    choose.addEventListener(
+                        "click",
+                        function (e) {
+                            e.preventDefault();
+                            const ageFilterValue = choose.getAttribute("data-value");
+                            this.setAgeFilterValue(ageFilterValue);
+                            this.filterAgeMenu(agesMenuSummary, agesMenuChooses);
+                            filterCallback(ageFilterValue);
+                        }.bind(this),
+                    );
+                }.bind(this),
+            );
+        } else {
+            agesMenu.classList.add("tm-hidden");
         }
 
         document.body.appendChild(container);

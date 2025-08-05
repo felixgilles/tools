@@ -346,4 +346,20 @@ class TmFilter {
             }
         });
     }
+
+    setCacheValue(key, value) {
+        const cache = {
+            date: new Date().getTime(),
+            value: value,
+        };
+        GM_setValue(key, cache);
+    }
+
+    getCacheValue(key) {
+        const cache = GM_getValue(key);
+        if (cache && cache.date > new Date().getTime() - 1000 * 60 * 60 * 4) {
+            return cache.value;
+        }
+        return null;
+    }
 }

@@ -357,7 +357,7 @@ class TmFilter {
 
     getCacheValue(key) {
         const cache = GM_getValue(key);
-        if (cache && cache.date > new Date().getTime() - 1000 * 60 * 60 * 4) {
+        if (cache && typeof cache === "object" && cache.date > new Date().getTime() - 1000 * 60 * 60 * 4) {
             return cache.value;
         }
         return null;

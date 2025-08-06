@@ -295,11 +295,7 @@ class TmFilter {
         if (stored && typeof stored === "object" && stored.date > new Date().getTime() - 1000 * 60 * 60 * 24 * 3) {
             return this.indicatorHiddenTemp;
         }
-        if (
-            typeof stored === "string" &&
-            stored === this.indicatorHiddenTemp &&
-            new Date().getTime() > new Date("2025-11-06").getTime()
-        ) {
+        if (stored === this.indicatorHiddenTemp) {
             return false;
         }
         return stored;

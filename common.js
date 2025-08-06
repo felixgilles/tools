@@ -186,7 +186,7 @@ class TmFilter {
                     e.stopImmediatePropagation();
                     const alt = e.altKey || e.ctrlKey || e.metaKey || e.shiftKey;
                     TmDebug("toggleProfile click", profile, !!this.getIndicatorValue(profile), "alt", alt);
-                    this.setIndicatorValue(profile, !this.getIndicatorValue(profile), !!alt);
+                    this.setIndicatorValue(profile, !this.getIndicatorValue(profile), !alt);
                     this.profileButton(toggleProfile, profile);
                 }.bind(this),
             );
@@ -357,7 +357,7 @@ class TmFilter {
                 e.preventDefault();
                 e.stopImmediatePropagation();
                 const indicatorValue = this.getIndicatorValue(id);
-                this.setIndicatorValue(id, !indicatorValue, true);
+                this.setIndicatorValue(id, !indicatorValue);
                 this.indicatorButton(indicator, indicatorHide, !indicatorValue, "C");
                 this.indicatorButton(indicator, indicatorDelete, !indicatorValue, "S");
                 callback(!indicatorValue);

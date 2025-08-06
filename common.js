@@ -313,11 +313,11 @@ class TmFilter {
         GM_setValue(this.indicatorCookie + id, store);
     }
 
-    indicatorButton(indicator, link, hidden, textAction) {
-        if (hidden) {
+    indicatorButton(indicator, link, indicatorValue, textAction) {
+        if (indicatorValue) {
             indicator.classList.remove("tm-badge-success");
             indicator.classList.add("tm-badge-error");
-            link.innerHTML = "A";
+            link.innerHTML = indicatorValue === this.indicatorHiddenTemp ? "A" : "R";
         } else {
             indicator.classList.remove("tm-badge-error");
             indicator.classList.add("tm-badge-success");
@@ -335,9 +335,9 @@ class TmFilter {
 
         const indicatorHide = document.createElement("a");
         indicatorHide.style.marginRight = "0.5rem";
-        this.indicatorButton(indicator, indicatorHide, !!indicatorValue, "C");
+        this.indicatorButton(indicator, indicatorHide, indicatorValue, "C");
         const indicatorDelete = document.createElement("a");
-        this.indicatorButton(indicator, indicatorDelete, !!indicatorValue, "S");
+        this.indicatorButton(indicator, indicatorDelete, indicatorValue, "S");
 
         indicatorHide.addEventListener(
             "click",
@@ -346,8 +346,8 @@ class TmFilter {
                 e.stopImmediatePropagation();
                 const indicatorValue = this.getIndicatorValue(id);
                 this.setIndicatorValue(id, !indicatorValue, true);
-                this.indicatorButton(indicator, indicatorHide, !indicatorValue, "C");
-                this.indicatorButton(indicator, indicatorDelete, !indicatorValue, "S");
+                this.indicatorButton(indicator, indicatorHide, this.getIndicatorValue(id), "C");
+                this.indicatorButton(indicator, indicatorDelete, this.getIndicatorValue(id), "S");
                 callback(!indicatorValue);
             }.bind(this),
         );
@@ -358,8 +358,8 @@ class TmFilter {
                 e.stopImmediatePropagation();
                 const indicatorValue = this.getIndicatorValue(id);
                 this.setIndicatorValue(id, !indicatorValue);
-                this.indicatorButton(indicator, indicatorHide, !indicatorValue, "C");
-                this.indicatorButton(indicator, indicatorDelete, !indicatorValue, "S");
+                this.indicatorButton(indicator, indicatorHide, this.getIndicatorValue(id), "C");
+                this.indicatorButton(indicator, indicatorDelete, this.getIndicatorValue(id), "S");
                 callback(!indicatorValue);
             }.bind(this),
         );

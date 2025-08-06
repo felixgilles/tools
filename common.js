@@ -69,8 +69,13 @@ class TmFilter {
 
     profileButton(button, id) {
         let value = this.getIndicatorValue(id);
-        button.innerHTML = value === "hidden" ? "Profil caché" : "Profil affiché";
-        if (value === "hidden") {
+        button.innerHTML =
+            value === this.indicatorHiddenTemp
+                ? "Profil caché temporairement"
+                : value === this.indicatorHiddenDefinitive
+                  ? "Profil caché définitivement"
+                  : "Profil affiché";
+        if (!!value) {
             button.classList.remove("tm-active");
         } else {
             button.classList.add("tm-active");
@@ -179,9 +184,18 @@ class TmFilter {
                 function (e) {
                     e.preventDefault();
                     e.stopImmediatePropagation();
-                    let indicatorValue = this.getIndicatorValue(profile);
-                    indicatorValue = indicatorValue === "hidden" ? "" : "hidden";
-                    this.setIndicatorValue(profile, indicatorValue);
+                    TmDebug("toggleProfile click", profile, !!this.getIndicatorValue(profile));
+                    this.setIndicatorValue(profile, !!this.getIndicatorValue(profile), true);
+                    this.profileButton(toggleProfile, profile);
+                }.bind(this),
+            );
+            toggleProfile.addEventListener(
+                "dblclick",
+                function (e) {
+                    e.preventDefault();
+                    e.stopImmediatePropagation();
+                    TmDebug("toggleProfile dblclick", profile, !!this.getIndicatorValue(profile));
+                    this.setIndicatorValue(profile, !!this.getIndicatorValue(profile));
                     this.profileButton(toggleProfile, profile);
                 }.bind(this),
             );
@@ -189,11 +203,15 @@ class TmFilter {
                 "keydown",
                 function (e) {
                     if (e.code === "KeyH") {
-                        this.setIndicatorValue(profile, "hidden");
+                        this.setIndicatorValue(profile, true, true);
                         this.profileButton(toggleProfile, profile);
                     }
                     if (e.code === "KeyS") {
-                        this.setIndicatorValue(profile, "");
+                        this.setIndicatorValue(profile, false);
+                        this.profileButton(toggleProfile, profile);
+                    }
+                    if (e.code === "KeyD") {
+                        this.setIndicatorValue(profile, true);
                         this.profileButton(toggleProfile, profile);
                     }
                 }.bind(this),
@@ -279,44 +297,83 @@ class TmFilter {
     }
 
     indicatorCookie = "tm-indicator-";
+    indicatorHiddenTemp = "hidden";
+    indicatorHiddenDefinitive = "remove";
     getIndicatorValue(id) {
-        return GM_getValue(this.indicatorCookie + id);
+        const stored = GM_getValue(this.indicatorCookie + id);
+        if (stored && typeof stored === "object" && stored.date > new Date().getTime() - 1000 * 60 * 60 * 24 * 3) {
+            return this.indicatorHiddenTemp;
+        }
+        return stored;
     }
-    setIndicatorValue(id, value) {
-        GM_setValue(this.indicatorCookie + id, value);
+    setIndicatorValue(id, value, temp) {
+        let store;
+        if (value) {
+            store = temp
+                ? {
+                      date: new Date().getTime(),
+                      value: this.indicatorHiddenTemp,
+                  }
+                : this.indicatorHiddenDefinitive;
+        } else {
+            store = false;
+        }
+
+        GM_setValue(this.indicatorCookie + id, store);
     }
 
-    indicatorButton(indicator, hidden) {
+    indicatorButton(indicator, link, hidden, textAction) {
         if (hidden) {
             indicator.classList.remove("tm-badge-success");
             indicator.classList.add("tm-badge-error");
-            indicator.innerHTML = "A";
+            link.innerHTML = "A";
         } else {
             indicator.classList.remove("tm-badge-error");
             indicator.classList.add("tm-badge-success");
-            indicator.innerHTML = "C";
+            link.innerHTML = textAction;
         }
     }
 
     indicator(parent, id, callback) {
         parent.classList.add("tm-indicator");
 
-        const indicator = document.createElement("a");
+        const indicator = document.createElement("span");
         indicator.className = "tm-indicator-item tm-indicator-center tm-badge";
 
-        let indicatorValue = this.getIndicatorValue(id);
-        this.indicatorButton(indicator, indicatorValue === "hidden");
-        indicator.addEventListener(
+        const indicatorValue = this.getIndicatorValue(id);
+
+        const indicatorHide = document.createElement("a");
+        indicatorHide.style.marginRight = "0.5rem";
+        this.indicatorButton(indicator, indicatorHide, !!indicatorValue, "C");
+        const indicatorDelete = document.createElement("a");
+        this.indicatorButton(indicator, indicatorDelete, !!indicatorValue, "S");
+
+        indicatorHide.addEventListener(
             "click",
             function (e) {
                 e.preventDefault();
                 e.stopImmediatePropagation();
-                indicatorValue = indicatorValue === "hidden" ? "" : "hidden";
-                this.setIndicatorValue(id, indicatorValue);
-                this.indicatorButton(indicator, indicatorValue === "hidden");
-                callback(indicatorValue === "hidden");
+                const indicatorValue = this.getIndicatorValue(id);
+                this.setIndicatorValue(id, !indicatorValue, true);
+                this.indicatorButton(indicator, indicatorHide, !indicatorValue, "C");
+                this.indicatorButton(indicator, indicatorDelete, !indicatorValue, "S");
+                callback(!indicatorValue);
             }.bind(this),
         );
+        indicatorDelete.addEventListener(
+            "click",
+            function (e) {
+                e.preventDefault();
+                e.stopImmediatePropagation();
+                const indicatorValue = this.getIndicatorValue(id);
+                this.setIndicatorValue(id, !indicatorValue, true);
+                this.indicatorButton(indicator, indicatorHide, !indicatorValue, "C");
+                this.indicatorButton(indicator, indicatorDelete, !indicatorValue, "S");
+                callback(!indicatorValue);
+            }.bind(this),
+        );
+
+        indicator.append(indicatorHide, indicatorDelete);
         parent.append(indicator);
     }
 

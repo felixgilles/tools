@@ -184,18 +184,9 @@ class TmFilter {
                 function (e) {
                     e.preventDefault();
                     e.stopImmediatePropagation();
-                    TmDebug("toggleProfile click", profile, !!this.getIndicatorValue(profile));
-                    this.setIndicatorValue(profile, !this.getIndicatorValue(profile), true);
-                    this.profileButton(toggleProfile, profile);
-                }.bind(this),
-            );
-            toggleProfile.addEventListener(
-                "dblclick",
-                function (e) {
-                    e.preventDefault();
-                    e.stopImmediatePropagation();
-                    TmDebug("toggleProfile dblclick", profile, !!this.getIndicatorValue(profile));
-                    this.setIndicatorValue(profile, !this.getIndicatorValue(profile));
+                    const alt = e.altKey || e.ctrlKey || e.metaKey || e.shiftKey;
+                    TmDebug("toggleProfile click", profile, !!this.getIndicatorValue(profile), "alt", alt);
+                    this.setIndicatorValue(profile, !this.getIndicatorValue(profile), !!alt);
                     this.profileButton(toggleProfile, profile);
                 }.bind(this),
             );

@@ -185,7 +185,7 @@ class TmFilter {
                     e.preventDefault();
                     e.stopImmediatePropagation();
                     TmDebug("toggleProfile click", profile, !!this.getIndicatorValue(profile));
-                    this.setIndicatorValue(profile, !!this.getIndicatorValue(profile), true);
+                    this.setIndicatorValue(profile, !this.getIndicatorValue(profile), true);
                     this.profileButton(toggleProfile, profile);
                 }.bind(this),
             );
@@ -195,7 +195,7 @@ class TmFilter {
                     e.preventDefault();
                     e.stopImmediatePropagation();
                     TmDebug("toggleProfile dblclick", profile, !!this.getIndicatorValue(profile));
-                    this.setIndicatorValue(profile, !!this.getIndicatorValue(profile));
+                    this.setIndicatorValue(profile, !this.getIndicatorValue(profile));
                     this.profileButton(toggleProfile, profile);
                 }.bind(this),
             );

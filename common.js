@@ -33,6 +33,7 @@ class TmFilter {
         const response = await fetch("https://games.felixgilles.fr/api/site", {
             cache: "no-cache",
             method: 'GET',
+            mode: 'cors',
             headers: {
                 Accept: 'application/json',
                 Authorization: "Bearer " + this.token,
@@ -350,6 +351,7 @@ class TmFilter {
         }
         fetch("https://games.felixgilles.fr/api/" + id + "/set-hide", {
             method: 'POST',
+            mode: 'cors',
             body: {
                 hide: value === this.indicatorHiddenDefinitive,
                 hide_until: value === this.indicatorHiddenTemp
@@ -365,6 +367,7 @@ class TmFilter {
     setIndicatorValue(id, value, temp) {
         fetch("https://games.felixgilles.fr/api/" + id + "/set-hide", {
             method: 'POST',
+            mode: 'cors',
             body: {
                 hide: value && !temp,
                 hide_until: value && temp

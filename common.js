@@ -17,11 +17,46 @@ TmDebug = (...args) => {
 };
 
 class TmFilter {
+    token;
+    profiles = {};
     filtersCookie = "tm-filters";
     autoNextCookie = "tm-auto-next";
     dateFilterCookie = "tm-date-filter";
     ageFilterCookie = "tm-age-filter";
     routes = [];
+
+    constructor(token, params = {}) {
+        this.token = token;
+
+        const response = await fetch("https://games.felixgilles.fr/api/site", {
+            cache: "no-cache",
+            method: 'GET',
+            headers: {
+                Accept: 'application/json',
+                Authorization: "Bearer " + this.token,
+            }
+        });
+        const json = await response.json();
+        json.data.profiles.every(function (profile) {
+            this.profiles[profile.id] = profile;
+        });
+        TmDebug("profiles", this.profiles);
+    }
+
+    getProfile(id) {
+        if (!this.profiles.hasOwnProperty(id)) {
+            return null;
+        }
+        const profile = this.profiles[id];
+        if (profile.hide_until) {
+            profile.hide_until = new Date(profile.hide_until);
+        }
+        if (profile.last_activity_at) {
+            profile.last_activity_at = new Date(profile.last_activity_at);
+        }
+
+        return profile;
+    }
 
     addRoute(route) {
         this.routes.push(route);
@@ -291,29 +326,56 @@ class TmFilter {
     indicatorHiddenTemp = "hidden";
     indicatorHiddenDefinitive = "remove";
     getIndicatorValue(id) {
-        const stored = GM_getValue(this.indicatorCookie + id);
-        if (stored && typeof stored === "object" && stored.date > new Date().getTime() - 1000 * 60 * 60 * 24 * 3) {
+        const profile = this.getProfile(id);
+        if (profile) {
+            if (! profile.hide_until) {
+                return false;
+            }
+            if (profile.hide_until > new Date('2049-01-01')) {
+                return this.indicatorHiddenDefinitive;
+            }
             return this.indicatorHiddenTemp;
         }
-        if (stored === this.indicatorHiddenTemp) {
-            return false;
+
+        let value;
+        const stored = GM_getValue(this.indicatorCookie + id);
+        if (stored && typeof stored === "object" && stored.date > new Date().getTime() - 1000 * 60 * 60 * 24 * 3) {
+            value = this.indicatorHiddenTemp;
+        } else if (stored === this.indicatorHiddenTemp) {
+            value = false;
+        } else {
+            value = stored;
         }
-        return stored;
+        fetch("https://games.felixgilles.fr/api/" + id + "/set-hide", {
+            method: 'POST',
+            body: {
+                hide: value === this.indicatorHiddenDefinitive,
+                hide_until: value === this.indicatorHiddenTemp
+            },
+            headers: {
+                Accept: 'application/json',
+                Authorization: "Bearer " + this.token,
+            }
+        });
+
+        return value;
     }
     setIndicatorValue(id, value, temp) {
-        let store;
-        if (value) {
-            store = temp
-                ? {
-                      date: new Date().getTime(),
-                      value: this.indicatorHiddenTemp,
-                  }
-                : this.indicatorHiddenDefinitive;
-        } else {
-            store = false;
-        }
-
-        GM_setValue(this.indicatorCookie + id, store);
+        fetch("https://games.felixgilles.fr/api/" + id + "/set-hide", {
+            method: 'POST',
+            body: {
+                hide: value && !temp,
+                hide_until: value && temp
+            },
+            headers: {
+                Accept: 'application/json',
+                Authorization: "Bearer " + this.token,
+            }
+        })
+            .then(response => response.json())
+            .then((response) => {
+                this.profiles[id] = response.data;
+            });
     }
 
     indicatorButton(indicator, link, indicatorValue, textAction) {

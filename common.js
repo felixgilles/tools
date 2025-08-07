@@ -42,7 +42,7 @@ class TmFilter {
         TmDebug("loadProfiles response", response);
         const json = await response.json();
         TmDebug("loadProfiles json", json);
-        json.data.profiles.every((function (profile) {
+        json.data.profiles.forEach((function (profile) {
             this.profiles[profile.slug] = profile;
         }).bind(this));
         TmDebug("loadProfiles profiles", this.profiles);

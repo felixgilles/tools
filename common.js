@@ -44,7 +44,7 @@ class TmFilter {
         TmDebug("json", json);
         json.data.profiles.every(function (profile) {
             this.profiles[profile.id] = profile;
-        });
+        }).bind(this);
         TmDebug("profiles", this.profiles);
     }
 

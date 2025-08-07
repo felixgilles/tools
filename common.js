@@ -25,9 +25,11 @@ class TmFilter {
     ageFilterCookie = "tm-age-filter";
     routes = [];
 
-    async constructor(token, params = {}) {
+    constructor(token) {
         this.token = token;
+    }
 
+    async loadProfiles() {
         const response = await fetch("https://games.felixgilles.fr/api/site", {
             cache: "no-cache",
             method: 'GET',

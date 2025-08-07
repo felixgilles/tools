@@ -361,6 +361,7 @@ class TmFilter {
             headers: {
                 Accept: 'application/json',
                 Authorization: "Bearer " + this.token,
+                "Content-Type": "application/json"
             }
         });
 
@@ -377,6 +378,7 @@ class TmFilter {
             headers: {
                 Accept: 'application/json',
                 Authorization: "Bearer " + this.token,
+                "Content-Type": "application/json"
             }
         })
             .then(response => response.json())

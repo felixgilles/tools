@@ -39,13 +39,13 @@ class TmFilter {
                 Authorization: "Bearer " + this.token,
             }
         });
-        TmDebug("response", this.response);
+        TmDebug("loadProfiles response", response);
         const json = await response.json();
-        TmDebug("json", json);
+        TmDebug("loadProfiles json", json);
         json.data.profiles.every((function (profile) {
             this.profiles[profile.id] = profile;
         }).bind(this));
-        TmDebug("profiles", this.profiles);
+        TmDebug("loadProfiles profiles", this.profiles);
     }
 
     getProfile(id) {
@@ -354,10 +354,10 @@ class TmFilter {
         fetch("https://games.felixgilles.fr/api/" + id + "/set-hide", {
             method: 'POST',
             mode: 'cors',
-            body: {
+            body: JSON.stringify({
                 hide: value === this.indicatorHiddenDefinitive,
                 hide_until: value === this.indicatorHiddenTemp
-            },
+            }),
             headers: {
                 Accept: 'application/json',
                 Authorization: "Bearer " + this.token,
@@ -370,10 +370,10 @@ class TmFilter {
         fetch("https://games.felixgilles.fr/api/" + id + "/set-hide", {
             method: 'POST',
             mode: 'cors',
-            body: {
+            body: JSON.stringify({
                 hide: value && !temp,
                 hide_until: value && temp
-            },
+            }),
             headers: {
                 Accept: 'application/json',
                 Authorization: "Bearer " + this.token,

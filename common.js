@@ -332,6 +332,7 @@ class TmFilter {
     indicatorHiddenDefinitive = "remove";
     getIndicatorValue(id) {
         const profile = this.getProfile(id);
+        TmDebug('getIndicatorValue', id, profile);
         if (profile) {
             if (! profile.hide_until) {
                 return false;
@@ -368,6 +369,7 @@ class TmFilter {
         return value;
     }
     setIndicatorValue(id, value, temp) {
+        TmDebug('setIndicatorValue', id, value, temp);
         fetch("https://games.felixgilles.fr/api/" + id + "/set-hide", {
             method: 'POST',
             mode: 'cors',

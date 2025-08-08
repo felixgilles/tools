@@ -47,8 +47,8 @@ class TmFilter {
         TmDebug("loadProfiles profiles", this.profiles);
     }
 
-    async saveProfiles(id, profile, then) {
-        const response = await fetch("https://games.felixgilles.fr/api/update/" + id, {
+    saveProfiles(id, profile) {
+        return fetch("https://games.felixgilles.fr/api/update/" + id, {
             method: 'POST',
             mode: 'cors',
             body: JSON.stringify(profile),
@@ -57,16 +57,17 @@ class TmFilter {
                 Authorization: "Bearer " + this.token,
                 "Content-Type": "application/json"
             }
-        });
-        const json = await response.json();
-        await then(json.data);
+        })
+            .then(response => response.json().data);
+        ;
     }
 
     setCurrentProfile(profile) {
         this.currentProfile = profile;
-        this.saveProfiles(profile.slug, profile, function (profile) {
-            this.currentProfile = profile;
-        }.bind(this));
+        this.saveProfiles(profile.slug, profile)
+            .then(function (profile) {
+                this.currentProfile = profile;
+            }.bind(this));
     }
 
     getProfile(id) {
@@ -378,17 +379,17 @@ class TmFilter {
         }
         this.saveProfiles(id, {
             hide_until: value === this.indicatorHiddenTemp ? 'temp' : (value === this.indicatorHiddenDefinitive ? 'unlimited' : null)
-        }, function (profile) {
+        }).then(function (profile) {
             this.setProfile(id, profile);
         }.bind(this));
 
         return value;
     }
-    setIndicatorValue(id, value, temp) {
+    async setIndicatorValue(id, value, temp) {
         TmDebug('setIndicatorValue', id, value, temp);
-        this.saveProfiles(id, {
+        await this.saveProfiles(id, {
             hide_until: value ? (temp ? 'temp' : 'unlimited') : null
-        }, function (profile) {
+        }).then(function (profile) {
             TmDebug('setIndicatorValue then', id, profile);
             this.profiles[id] = profile;
         }.bind(this));

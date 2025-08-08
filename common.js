@@ -58,15 +58,15 @@ class TmFilter {
                 "Content-Type": "application/json"
             }
         })
-            .then(response => response.json().data);
+            .then(response => response.json());
         ;
     }
 
     setCurrentProfile(profile) {
         this.currentProfile = profile;
         this.saveProfiles(profile.slug, profile)
-            .then(function (profile) {
-                this.currentProfile = profile;
+            .then(function (json) {
+                this.currentProfile = json.data;
             }.bind(this));
     }
 
@@ -379,8 +379,8 @@ class TmFilter {
         }
         this.saveProfiles(id, {
             hide_until: value === this.indicatorHiddenTemp ? 'temp' : (value === this.indicatorHiddenDefinitive ? 'unlimited' : null)
-        }).then(function (profile) {
-            this.setProfile(id, profile);
+        }).then(function (json) {
+            this.setProfile(id, json.data);
         }.bind(this));
 
         return value;
@@ -389,9 +389,9 @@ class TmFilter {
         TmDebug('setIndicatorValue', id, value, temp);
         await this.saveProfiles(id, {
             hide_until: value ? (temp ? 'temp' : 'unlimited') : null
-        }).then(function (profile) {
-            TmDebug('setIndicatorValue then', id, profile);
-            this.profiles[id] = profile;
+        }).then(function (json) {
+            TmDebug('setIndicatorValue then', id, json.data);
+            this.profiles[id] = json.data;
         }.bind(this));
 
         TmDebug('setIndicatorValue return', id, value ? (temp ? this.indicatorHiddenTemp : this.indicatorHiddenDefinitive) : false);

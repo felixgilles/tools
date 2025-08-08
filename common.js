@@ -24,6 +24,7 @@ class TmFilter {
     dateFilterCookie = "tm-date-filter";
     ageFilterCookie = "tm-age-filter";
     routes = [];
+    currentProfile = {};
 
     constructor(token) {
         this.token = token;
@@ -39,9 +40,7 @@ class TmFilter {
                 Authorization: "Bearer " + this.token,
             }
         });
-        TmDebug("loadProfiles response", response);
         const json = await response.json();
-        TmDebug("loadProfiles json", json);
         json.data.profiles.forEach((function (profile) {
             this.profiles[profile.slug] = profile;
         }).bind(this));
@@ -55,9 +54,6 @@ class TmFilter {
         const profile = this.profiles[id];
         if (profile.hide_until) {
             profile.hide_until = new Date(profile.hide_until);
-        }
-        if (profile.last_activity_at) {
-            profile.last_activity_at = new Date(profile.last_activity_at);
         }
 
         return profile;
@@ -114,7 +110,9 @@ class TmFilter {
                 ? "Profil caché temporairement"
                 : value === this.indicatorHiddenDefinitive
                   ? "Profil caché définitivement"
-                  : "Profil affiché";
+                  : value === false
+                        ? "Profil affiché"
+                        : "Profil non référencé";
         if (!!value) {
             button.classList.remove("tm-active");
         } else {
@@ -171,6 +169,9 @@ class TmFilter {
         const filterAge = params.filterAge ?? false;
         const autoNext = params.autoNext ?? false;
         const profile = params.profile ?? null;
+        if (profile) {
+            this.currentProfile = params.profileInfos ?? {};
+        }
         const container = document.createElement("div");
         container.className = "tm-fixed tm-bottom-0 tm-right-0";
         container.innerHTML =
@@ -345,20 +346,21 @@ class TmFilter {
 
         let value;
         const stored = GM_getValue(this.indicatorCookie + id);
-        if (stored && typeof stored === "object" && stored.date > new Date().getTime() - 1000 * 60 * 60 * 24 * 3) {
-            value = this.indicatorHiddenTemp;
-        } else if (stored === this.indicatorHiddenTemp) {
-            value = false;
+        if (stored === undefined) {
+            return undefined;
+        }
+        if (typeof stored === "object") {
+            value = stored.value;
         } else {
             value = stored;
         }
-        fetch("https://games.felixgilles.fr/api/" + id + "/set-hide", {
+        fetch("https://games.felixgilles.fr/api/update/" + id, {
             method: 'POST',
             mode: 'cors',
-            body: JSON.stringify({
-                hide: value === this.indicatorHiddenDefinitive,
-                hide_until: value === this.indicatorHiddenTemp
-            }),
+            body: JSON.stringify(Object.assign(
+                this.currentProfile,
+                {hide_until: value === this.indicatorHiddenTemp ? 'temp' : (value === this.indicatorHiddenDefinitive ? 'unlimited' : null)}
+            )),
             headers: {
                 Accept: 'application/json',
                 Authorization: "Bearer " + this.token,
@@ -370,13 +372,13 @@ class TmFilter {
     }
     setIndicatorValue(id, value, temp) {
         TmDebug('setIndicatorValue', id, value, temp);
-        fetch("https://games.felixgilles.fr/api/" + id + "/set-hide", {
+        fetch("https://games.felixgilles.fr/api/update/" + id, {
             method: 'POST',
             mode: 'cors',
-            body: JSON.stringify({
-                hide: value && !temp,
-                hide_until: value && temp
-            }),
+            body: JSON.stringify(Object.assign(
+                this.currentProfile,
+                {hide_until: value ? (temp ? 'temp' : 'unlimited') : null}
+            )),
             headers: {
                 Accept: 'application/json',
                 Authorization: "Bearer " + this.token,
@@ -387,17 +389,23 @@ class TmFilter {
             .then((response) => {
                 this.profiles[id] = response.data;
             });
+
+        return value ? (temp ? this.indicatorHiddenTemp : this.indicatorHiddenDefinitive) : false;
     }
 
-    indicatorButton(indicator, link, indicatorValue, textAction) {
-        if (indicatorValue) {
+    indicatorColor(indicator, indicatorValue) {
+        if (indicatorValue === undefined) {
             indicator.classList.remove("tm-badge-success");
+            indicator.classList.remove("tm-badge-error");
+            indicator.classList.add("tm-badge-warning");
+        } else if (indicatorValue) {
+            indicator.classList.remove("tm-badge-success");
+            indicator.classList.remove("tm-badge-warning");
             indicator.classList.add("tm-badge-error");
-            link.innerHTML = indicatorValue === this.indicatorHiddenTemp ? "A" : "R";
         } else {
+            indicator.classList.remove("tm-badge-warning");
             indicator.classList.remove("tm-badge-error");
             indicator.classList.add("tm-badge-success");
-            link.innerHTML = textAction;
         }
     }
 
@@ -409,22 +417,36 @@ class TmFilter {
 
         const indicatorValue = this.getIndicatorValue(id);
 
+        this.indicatorColor(indicator, indicatorValue);
+
+        const indicatorShow = document.createElement("a");
+        indicatorShow.style.marginRight = "0.5rem";
+        indicatorShow.innerHTML = "A";
         const indicatorHide = document.createElement("a");
         indicatorHide.style.marginRight = "0.5rem";
-        this.indicatorButton(indicator, indicatorHide, indicatorValue, "C");
+        indicatorHide.innerHTML = "C";
         const indicatorDelete = document.createElement("a");
-        this.indicatorButton(indicator, indicatorDelete, indicatorValue, "S");
+        indicatorDelete.innerHTML = "S";
+
+        indicatorShow.addEventListener(
+            "click",
+            function (e) {
+                e.preventDefault();
+                e.stopImmediatePropagation();
+                const newValue = this.setIndicatorValue(id, false);
+                this.indicatorColor(indicator, newValue);
+                callback(newValue);
+            }.bind(this),
+        );
 
         indicatorHide.addEventListener(
             "click",
             function (e) {
                 e.preventDefault();
                 e.stopImmediatePropagation();
-                const indicatorValue = this.getIndicatorValue(id);
-                this.setIndicatorValue(id, !indicatorValue, true);
-                this.indicatorButton(indicator, indicatorHide, this.getIndicatorValue(id), "C");
-                this.indicatorButton(indicator, indicatorDelete, this.getIndicatorValue(id), "S");
-                callback(!indicatorValue);
+                const newValue = this.setIndicatorValue(id, true, true);
+                this.indicatorColor(indicator, newValue);
+                callback(newValue);
             }.bind(this),
         );
         indicatorDelete.addEventListener(
@@ -432,15 +454,13 @@ class TmFilter {
             function (e) {
                 e.preventDefault();
                 e.stopImmediatePropagation();
-                const indicatorValue = this.getIndicatorValue(id);
-                this.setIndicatorValue(id, !indicatorValue);
-                this.indicatorButton(indicator, indicatorHide, this.getIndicatorValue(id), "C");
-                this.indicatorButton(indicator, indicatorDelete, this.getIndicatorValue(id), "S");
-                callback(!indicatorValue);
+                const newValue = this.setIndicatorValue(id, true);
+                this.indicatorColor(indicator, newValue);
+                callback(newValue);
             }.bind(this),
         );
 
-        indicator.append(indicatorHide, indicatorDelete);
+        indicator.append(indicatorShow, indicatorHide, indicatorDelete);
         parent.append(indicator);
     }
 

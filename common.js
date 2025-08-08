@@ -47,8 +47,8 @@ class TmFilter {
         TmDebug("loadProfiles profiles", this.profiles);
     }
 
-    saveProfiles(id, profile, then) {
-        return fetch("https://games.felixgilles.fr/api/update/" + id, {
+    async saveProfiles(id, profile, then) {
+        const response = await fetch("https://games.felixgilles.fr/api/update/" + id, {
             method: 'POST',
             mode: 'cors',
             body: JSON.stringify(profile),
@@ -57,12 +57,9 @@ class TmFilter {
                 Authorization: "Bearer " + this.token,
                 "Content-Type": "application/json"
             }
-        })
-            .then(response => response.json())
-            .then((response) => {
-                then(response.data)
-            });
-        ;
+        });
+        const json = await response.json();
+        await then(json.data);
     }
 
     setCurrentProfile(profile) {

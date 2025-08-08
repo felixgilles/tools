@@ -42,7 +42,7 @@ class TmFilter {
         });
         const json = await response.json();
         json.data.profiles.forEach((function (profile) {
-            this.profiles[profile.slug] = profile;
+            this.setProfile(profile.slug, profile);
         }).bind(this));
         TmDebug("loadProfiles profiles", this.profiles);
     }
@@ -76,12 +76,15 @@ class TmFilter {
         if (!this.profiles.hasOwnProperty(id)) {
             return null;
         }
-        const profile = this.profiles[id];
-        if (profile.hide_until) {
+
+        return  this.profiles[id];
+    }
+
+    setProfile(id, profile) {
+        if (profile && profile.hide_until) {
             profile.hide_until = new Date(profile.hide_until);
         }
-
-        return profile;
+        this.profiles[id] = profile;
     }
 
     addRoute(route) {
@@ -379,7 +382,7 @@ class TmFilter {
         this.saveProfiles(id, {
             hide_until: value === this.indicatorHiddenTemp ? 'temp' : (value === this.indicatorHiddenDefinitive ? 'unlimited' : null)
         }, function (profile) {
-            this.profiles[id] = profile;
+            this.setProfile(id, profile);
         }.bind(this));
 
         return value;

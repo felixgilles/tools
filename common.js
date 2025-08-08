@@ -32,7 +32,7 @@ class TmFilter {
 
     async loadProfiles() {
         const response = await fetch("https://games.felixgilles.fr/api/site", {
-            cache: "no-cache",
+            cache: "no-store",
             method: 'GET',
             mode: 'cors',
             headers: {

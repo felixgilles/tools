@@ -47,6 +47,31 @@ class TmFilter {
         TmDebug("loadProfiles profiles", this.profiles);
     }
 
+    saveProfiles(id, profile, then) {
+        fetch("https://games.felixgilles.fr/api/update/" + id, {
+            method: 'POST',
+            mode: 'cors',
+            body: JSON.stringify(profile),
+            headers: {
+                Accept: 'application/json',
+                Authorization: "Bearer " + this.token,
+                "Content-Type": "application/json"
+            }
+        })
+            .then(response => response.json())
+            .then((response) => {
+                then(response.data)
+            });
+        ;
+    }
+
+    setCurrentProfile(profile) {
+        this.currentProfile = profile;
+        this.saveProfiles(profile.slug, profile, function (profile) {
+            this.currentProfile = profile;
+        }.bind(this));
+    }
+
     getProfile(id) {
         if (!this.profiles.hasOwnProperty(id)) {
             return null;
@@ -169,9 +194,6 @@ class TmFilter {
         const filterAge = params.filterAge ?? false;
         const autoNext = params.autoNext ?? false;
         const profile = params.profile ?? null;
-        if (profile) {
-            this.currentProfile = params.profileInfos ?? {};
-        }
         const container = document.createElement("div");
         container.className = "tm-fixed tm-bottom-0 tm-right-0";
         container.innerHTML =
@@ -354,41 +376,21 @@ class TmFilter {
         } else {
             value = stored;
         }
-        fetch("https://games.felixgilles.fr/api/update/" + id, {
-            method: 'POST',
-            mode: 'cors',
-            body: JSON.stringify(Object.assign(
-                this.currentProfile,
-                {hide_until: value === this.indicatorHiddenTemp ? 'temp' : (value === this.indicatorHiddenDefinitive ? 'unlimited' : null)}
-            )),
-            headers: {
-                Accept: 'application/json',
-                Authorization: "Bearer " + this.token,
-                "Content-Type": "application/json"
-            }
-        });
+        this.saveProfiles(id, {
+            hide_until: value === this.indicatorHiddenTemp ? 'temp' : (value === this.indicatorHiddenDefinitive ? 'unlimited' : null)
+        }, function (profile) {
+            this.profiles[id] = data;
+        }.bind(this));
 
         return value;
     }
     setIndicatorValue(id, value, temp) {
         TmDebug('setIndicatorValue', id, value, temp);
-        fetch("https://games.felixgilles.fr/api/update/" + id, {
-            method: 'POST',
-            mode: 'cors',
-            body: JSON.stringify(Object.assign(
-                this.currentProfile,
-                {hide_until: value ? (temp ? 'temp' : 'unlimited') : null}
-            )),
-            headers: {
-                Accept: 'application/json',
-                Authorization: "Bearer " + this.token,
-                "Content-Type": "application/json"
-            }
-        })
-            .then(response => response.json())
-            .then((response) => {
-                this.profiles[id] = response.data;
-            });
+        this.saveProfiles(id, {
+            hide_until: value ? (temp ? 'temp' : 'unlimited') : null
+        }, function (profile) {
+            this.profiles[id] = profile;
+        });
 
         return value ? (temp ? this.indicatorHiddenTemp : this.indicatorHiddenDefinitive) : false;
     }

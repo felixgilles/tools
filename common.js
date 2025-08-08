@@ -371,7 +371,7 @@ class TmFilter {
 
         let value;
         const stored = GM_getValue(this.indicatorCookie + id);
-        if (stored === undefined) {
+        if (stored === undefined || stored === null) {
             return undefined;
         }
         if (typeof stored === "object") {

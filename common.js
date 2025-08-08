@@ -47,7 +47,7 @@ class TmFilter {
         TmDebug("loadProfiles profiles", this.profiles);
     }
 
-    async saveProfiles(id, profile, then) {
+    saveProfiles(id, profile, then) {
         return fetch("https://games.felixgilles.fr/api/update/" + id, {
             method: 'POST',
             mode: 'cors',

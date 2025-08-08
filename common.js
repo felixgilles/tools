@@ -379,7 +379,7 @@ class TmFilter {
         this.saveProfiles(id, {
             hide_until: value === this.indicatorHiddenTemp ? 'temp' : (value === this.indicatorHiddenDefinitive ? 'unlimited' : null)
         }, function (profile) {
-            this.profiles[id] = data;
+            this.profiles[id] = profile;
         }.bind(this));
 
         return value;

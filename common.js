@@ -245,28 +245,28 @@ class TmFilter {
             this.profileButton(toggleProfile, profile);
             toggleProfile.addEventListener(
                 "click",
-                function (e) {
+                async function (e) {
                     e.preventDefault();
                     e.stopImmediatePropagation();
                     const alt = e.altKey || e.ctrlKey || e.metaKey || e.shiftKey;
                     TmDebug("toggleProfile click", profile, !!this.getIndicatorValue(profile), "alt", alt);
-                    this.setIndicatorValue(profile, !this.getIndicatorValue(profile), !alt);
+                    await this.setIndicatorValue(profile, !this.getIndicatorValue(profile), !alt);
                     this.profileButton(toggleProfile, profile);
                 }.bind(this),
             );
             document.addEventListener(
                 "keydown",
-                function (e) {
+                async function (e) {
                     if (e.code === "KeyH") {
-                        this.setIndicatorValue(profile, true, true);
+                        await this.setIndicatorValue(profile, true, true);
                         this.profileButton(toggleProfile, profile);
                     }
                     if (e.code === "KeyS") {
-                        this.setIndicatorValue(profile, false);
+                        await this.setIndicatorValue(profile, false);
                         this.profileButton(toggleProfile, profile);
                     }
                     if (e.code === "KeyD") {
-                        this.setIndicatorValue(profile, true);
+                        await this.setIndicatorValue(profile, true);
                         this.profileButton(toggleProfile, profile);
                     }
                 }.bind(this),
@@ -457,7 +457,7 @@ class TmFilter {
         );
         indicatorDelete.addEventListener(
             "click",
-            function (e) {
+            async function (e) {
                 e.preventDefault();
                 e.stopImmediatePropagation();
                 const newValue = this.setIndicatorValue(id, true);

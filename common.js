@@ -64,7 +64,7 @@ class TmFilter {
 
     setCurrentProfile(profile) {
         this.currentProfile = profile;
-        await this.saveProfiles(profile.slug, profile, function (profile) {
+        this.saveProfiles(profile.slug, profile, function (profile) {
             this.currentProfile = profile;
         }.bind(this));
     }
@@ -386,7 +386,7 @@ class TmFilter {
     }
     setIndicatorValue(id, value, temp) {
         TmDebug('setIndicatorValue', id, value, temp);
-        await this.saveProfiles(id, {
+        this.saveProfiles(id, {
             hide_until: value ? (temp ? 'temp' : 'unlimited') : null
         }, function (profile) {
             this.profiles[id] = profile;

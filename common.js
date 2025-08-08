@@ -47,8 +47,8 @@ class TmFilter {
         TmDebug("loadProfiles profiles", this.profiles);
     }
 
-    saveProfiles(id, profile, then) {
-        fetch("https://games.felixgilles.fr/api/update/" + id, {
+    async saveProfiles(id, profile, then) {
+        return fetch("https://games.felixgilles.fr/api/update/" + id, {
             method: 'POST',
             mode: 'cors',
             body: JSON.stringify(profile),
@@ -67,7 +67,7 @@ class TmFilter {
 
     setCurrentProfile(profile) {
         this.currentProfile = profile;
-        this.saveProfiles(profile.slug, profile, function (profile) {
+        await this.saveProfiles(profile.slug, profile, function (profile) {
             this.currentProfile = profile;
         }.bind(this));
     }
@@ -389,7 +389,7 @@ class TmFilter {
     }
     setIndicatorValue(id, value, temp) {
         TmDebug('setIndicatorValue', id, value, temp);
-        this.saveProfiles(id, {
+        await this.saveProfiles(id, {
             hide_until: value ? (temp ? 'temp' : 'unlimited') : null
         }, function (profile) {
             this.profiles[id] = profile;

@@ -393,7 +393,7 @@ class TmFilter {
             hide_until: value ? (temp ? 'temp' : 'unlimited') : null
         }, function (profile) {
             this.profiles[id] = profile;
-        });
+        }.bind(this));
 
         return value ? (temp ? this.indicatorHiddenTemp : this.indicatorHiddenDefinitive) : false;
     }

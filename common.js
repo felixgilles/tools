@@ -107,7 +107,6 @@ class TmFilter {
         const data = await new Promise((resolve, reject) => {
             const reader = new FileReader()
             reader.onloadend = function () {
-                TmDebug("imageToData resolve", url, reader.result);
                 return resolve(reader.result);
             }
             reader.onerror = function () {

@@ -104,12 +104,21 @@ class TmFilter {
     async imageToData(url) {
         const response = await fetch(url);
         const blob = await response.blob();
-        return await new Promise((resolve, reject) => {
+        const data = await new Promise((resolve, reject) => {
             const reader = new FileReader()
-            reader.onloadend = () => resolve(reader.result)
-            reader.onerror = reject
+            reader.onloadend = function () {
+                TmDebug("imageToData resolve", url, reader.result);
+                return resolve(reader.result);
+            }
+            reader.onerror = function () {
+                TmDebug("imageToData reject", url);
+                reject()
+            };
             reader.readAsDataURL(blob)
         });
+        TmDebug("imageToData", url, data);
+
+        return data;
     }
 
     getFiltersValue() {
